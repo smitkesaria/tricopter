@@ -1,7 +1,4 @@
 from __future__ import print_function
-import qwiic_icm20948
-import time
-import sys
 import numpy as np
 from ahrs.filters import EKF
 from ahrs.common.orientation import acc2q, q2euler
@@ -10,22 +7,9 @@ import math
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from pygame.locals import *
-import threading
-import servo_utils
-
-
-ACC_FSR = 4                     # Full scale Range of accelerometer in g
-GYR_FSR = 4000                   # Full scale Range of gyroscope in dps
-MAG_FSR = 9800                  # Full scale Range of accelerometer in uT
-
-BIT_RESOLUTION = 65536          # Resolution (2^16)
-N_GYR_CAL = 1000
-q = acc2q(np.zeros([1,3]))
 
 useSerial = True # set true for using serial for data transmission, false for wifi
 useQuat = True   # set true for using quaternions, false for using y,p,r angles
-ekf = EKF()
-
 
 def resizewin(width, height):
     """
@@ -172,88 +156,3 @@ def quat_to_ypr(q):
     yaw   -= -0.13  # Declination at Chandrapur, Maharashtra is - 0 degress 13 min
     roll  *= 180.0 / math.pi
     return [yaw, pitch, roll]
-
-def run_ekf():
-    global q
-    time_now = 0
-    last_read = 0
-    acc_data = np.zeros([1,3])
-    gyr_data = np.zeros([1,3])
-    mag_data = np.zeros([1,3])
-    gyr_sample = np.zeros([N_GYR_CAL,3])
-    ekf.a_noise = 0.001
-    ekf.g_noise = 0.1
-    q = acc2q(acc_data)       # First sample of tri-axial accelerometer
-    draw(q[0], q[1], q[2], q[3])
-    pygame.display.flip()
-    print("\nSparkFun 9DoF ICM-20948 Sensor  Example 1\n")
-    IMU = qwiic_icm20948.QwiicIcm20948()
-
-    if IMU.connected == False:
-        print("The Qwiic ICM20948 device isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-
-    IMU.begin()
-    IMU.enableDlpfAccel(True)
-    IMU.enableDlpfGyro(True)
-    IMU.setFullScaleRangeGyro(0x03)
-
-    print("Calibrating Gyro")
-    for i in range(N_GYR_CAL):
-        if IMU.dataReady():
-            IMU.getAgmt()
-            gyr_sample[i-1] = np.array([float(IMU.gxRaw),float(IMU.gyRaw),float(IMU.gzRaw)]) * GYR_FSR/BIT_RESOLUTION
-            # print(gyr_sample[i-1])
-    print("Gyro calibarion done with bias as ")
-    gyr_bias=gyr_sample.mean(axis=0)
-    print(gyr_bias)
-    while True:
-        if IMU.dataReady():
-            time_now=time.time_ns()
-            if time_now - last_read >= 100000000:
-                IMU.getAgmt() # read all axis and temp from sensor, note this also updates all instance variables
-                ekf.Dt=(time_now-last_read)/1000000000
-                last_read = time_now
-                acc_data = np.array([float(IMU.axRaw),float(IMU.ayRaw),float(IMU.azRaw)]) * ACC_FSR/BIT_RESOLUTION
-                gyr_data = (np.array([float(IMU.gxRaw),float(IMU.gyRaw),float(IMU.gzRaw)]) * GYR_FSR/BIT_RESOLUTION) - (gyr_bias)
-                gyr_data = gyr_data*np.pi/180
-                mag_data = (np.array([float(IMU.mxRaw),float(IMU.myRaw),float(IMU.mzRaw)]) * MAG_FSR/BIT_RESOLUTION)
-                # print(1/ekf.Dt)
-                q = ekf.update( q=q,
-                                gyr=gyr_data, 
-                                acc=acc_data,
-                                # mag=mag_data,
-                                # mag=np.array([ mag_data[0] , -mag_data[1] , -mag_data[2] ]),
-                                )
-                # print(q2euler(q)*180/np.pi)
-                print('{: .2f}'.format(mag_data[0]), '{: .2f}'.format(mag_data[1]),'{: .2f}'.format(mag_data[2]),'{: .2f}'.format(acc_data[0]),'{: .2f}'.format(acc_data[1]),'{: .2f}'.format(acc_data[2]), end = "\r")
-                # print("")
-                # print(mag_data, end = "\r")
-def update_cube():
-    video_flags = OPENGL | DOUBLEBUF
-    pygame.init()
-    screen = pygame.display.set_mode((640, 480), video_flags)
-    # pygame.display.set_caption("PyTeapot IMU orientation visualization")
-    resizewin(640, 480)
-    init()
-    ticks = pygame.time.get_ticks()
-    while True:
-        global q 
-        draw(q[0], q[1], q[2], q[3])
-        pygame.display.flip()
-        time.sleep(1/100
-        
-        
-)
-
-
-if __name__ == '__main__':
-    ekf__thread = threading.Thread(target=run_ekf)
-    display_thread = threading.Thread(target=update_cube)
-    try:
-        ekf__thread.start()
-        display_thread.start()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 1")
-        sys.exit(0)
