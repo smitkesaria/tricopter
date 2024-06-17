@@ -7,7 +7,7 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(tricopter_interfaces REQUIRED)
+find_package(tricopter_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
 
 # uncomment the following section in order to fill in
@@ -15,7 +15,7 @@ find_package(rclcpp REQUIRED)
 # find_package(<dependency> REQUIRED)
 
 add_executable(dshot_node src/dshot_test.cpp src/motor-dshot.cpp)
-ament_target_dependencies(dshot_node rclcpp tricopter_interfaces)
+ament_target_dependencies(dshot_node rclcpp tricopter_msgs)
 
 
 install(TARGETS dshot_node

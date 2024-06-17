@@ -1,10 +1,18 @@
-from scservo_sdk import *                 # Uses SC Servo SDK library
+# Uses SC Servo SDK library
+from .port_handler import *
+from .protocol_packet_handler import *
+from .group_sync_write import *
+from .group_sync_read import *
+from .sms_sts import *
+from .scscl import *     
+
 import time
-class servo_utils():
+
+class ServoUtils():
 
     def __init__(self) -> None:
 
-        self.baudrate = 115200           # SC Servo default baudrate : 1000000
+        self.baudrate = 115200           # SC Servo default baudrate : 115200
         self.devicename = '/dev/ttyUSB0'    # Check which port is being used on your controller
     
         # Initialize PortHandler instance
@@ -30,11 +38,11 @@ class servo_utils():
             print("Failed to change the baudrate")
             quit()
 
-    def move_servo (self,position, speed, acc):
-    
+    def move_servo (self,id,position, speed, acc):
+
         # Write SC Servo goal position/moving speed/moving acc
         time_now = time.time_ns()
-        scs_comm_result, scs_error = self.packetHandler.WritePosEx(1, position, speed, acc)
+        scs_comm_result, scs_error = self.packetHandler.WritePosEx(id, position, speed, acc)
         if scs_comm_result != COMM_SUCCESS:
             print("%s" % self.packetHandler.getTxRxResult(scs_comm_result))
         if scs_error != 0:

@@ -7,7 +7,7 @@
   <maintainer email="smitkesaris@gmail.com">ubuntu</maintainer>
   <license>TODO: License declaration</license>
 
-  <depend>tricopter_interfaces</depend>
+  <depend>tricopter_msgs</depend>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
