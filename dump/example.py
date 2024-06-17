@@ -11,7 +11,6 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from pygame.locals import *
 import threading
-import servo_utils
 
 
 ACC_FSR = 4                     # Full scale Range of accelerometer in g

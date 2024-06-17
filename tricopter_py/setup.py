@@ -24,6 +24,7 @@ setup(
     entry_points={
         'console_scripts': [
             'servo_controller = tricopter_py.servo_controller:main',
+            'imu_publisher = tricopter_py.imu_publisher:main',
         ],
     },
 )
