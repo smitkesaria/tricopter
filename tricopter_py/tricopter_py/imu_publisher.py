@@ -8,6 +8,7 @@ import rclpy
 from rclpy.node import Node
 
 from sensor_msgs.msg import Imu
+from geometry_msgs.msg import Quaternion, Vector3
 
 
 class IMUPublisher(Node):
@@ -83,11 +84,15 @@ class IMUPublisher(Node):
             # print('{: .2f}'.format(self.mag_data[0]), '{: .2f}'.format(self.mag_data[1]),'{: .2f}'.format(self.mag_data[2]),'{: .2f}'.format(self.acc_data[0]),'{: .2f}'.format(self.acc_data[1]),'{: .2f}'.format(self.acc_data[2]), end = "\r")
             # print("")
             # print(self.mag_data, end = "\r")
-            self.imu_msg.orientation.w=self.q[0]
-            self.imu_msg.orientation.x=self.q[1]
-            self.imu_msg.orientation.y=self.q[2]
-            self.imu_msg.orientation.z=self.q[3]
-            self.publisher_.publish(self.imu_msg)
+            # self.imu_msg.orientation.w=self.q[0]
+            # self.imu_msg.orientation.x=self.q[1]
+            # self.imu_msg.orientation.y=self.q[2]
+            # self.imu_msg.orientation.z=self.q[3]
+            self.publisher_.publish(Imu(
+                orientation = Quaternion(w=self.q[0], x=self.q[1], y=self.q[2], z=self.q[3]), 
+                angular_velocity = Vector3(x = self.gyr_data[0], y = self.gyr_data[1], z = self.gyr_data[2]),
+                linear_acceleration = Vector3(x= self.acc_data[0], y= self.acc_data[1], z= self.acc_data[2])
+                                        ))
 
 
 
