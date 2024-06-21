@@ -57,25 +57,6 @@ class DisplayAngles(Node):
         glDepthFunc(GL_LEQUAL)
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
 
-    def cleanSerialBegin(self):
-        if(useQuat):
-            try:
-                line = ser.readline().decode('UTF-8').replace('\n', '')
-                w = float(line.split('w')[1])
-                nx = float(line.split('a')[1])
-                ny = float(line.split('b')[1])
-                nz = float(line.split('c')[1])
-            except Exception:
-                pass
-        else:
-            try:
-                line = ser.readline().decode('UTF-8').replace('\n', '')
-                yaw = float(line.split('y')[1])
-                pitch = float(line.split('p')[1])
-                roll = float(line.split('r')[1])
-            except Exception:
-                pass
-
     def draw(self,w, nx, ny, nz):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
