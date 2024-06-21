@@ -32,7 +32,7 @@ https://stackoverflow.com/questions/69425540/execute-mmap-on-linux-kernel
     // 600 or 1200. DSHOT_VERSION 150 seems to work fine on raspberry pi
     // zero 2, other values may not work.
     #ifndef DSHOT_VERSION
-    #define DSHOT_VERSION 300
+    #define DSHOT_VERSION 600
     #endif
 
 
@@ -62,9 +62,9 @@ https://stackoverflow.com/questions/69425540/execute-mmap-on-linux-kernel
 
     // DSHOT_600
     // Spec
-    //#define DSHOT_BIT_ns 1670
+    #define DSHOT_BIT_ns 1670
     // my ESC
-    #define DSHOT_BIT_ns 1400
+    // #define DSHOT_BIT_ns 1400
 
     #elif DSHOT_VERSION == 1200
 
