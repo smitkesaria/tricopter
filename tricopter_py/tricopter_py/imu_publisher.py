@@ -16,17 +16,17 @@ class IMUPublisher(Node):
 
     def __init__(self):
 
-        self.imu_msg=Imu()  # Message container for self.IMU getting updated by the self.IMU
+        self.imu_msg=Imu()                      # Message container for self.IMU getting updated by the self.IMU
         super().__init__('imu_publisher')
         self.publisher_ = self.create_publisher(Imu, 'tricopter/imu', 1)
         timer_period = 0.005  # seconds
 
         
-        self.ACC_FSR = 4                     # Full scale Range of accelerometer in g
-        self.GYR_FSR = 4000                   # Full scale Range of gyroscope in dps
-        self.MAG_FSR = 9800                  # Full scale Range of accelerometer in uT
+        self.ACC_FSR = 4                        # Full scale Range of accelerometer in g
+        self.GYR_FSR = 4000                     # Full scale Range of gyroscope in dps
+        self.MAG_FSR = 9800                     # Full scale Range of accelerometer in uT
 
-        self.BIT_RESOLUTION = 65536          # Resolution (2^16)
+        self.BIT_RESOLUTION = 65536             # Resolution (2^16)
         self.N_GYR_CAL = 1000
 
         self.ekf = EKF()
@@ -37,7 +37,7 @@ class IMUPublisher(Node):
         self.gyr_sample = np.zeros([self.N_GYR_CAL,3])
         self.ekf.a_noise = 0.001
         self.ekf.g_noise = 0.1
-        self.q = acc2q(self.acc_data)       # First sample of tri-axial accelerometer
+        self.q = acc2q(self.acc_data)           # First sample of tri-axial accelerometer
         self.time_now = 0
         self.last_read = 0
 
@@ -68,7 +68,7 @@ class IMUPublisher(Node):
 
         if self.IMU.dataReady():
             self.time_now=time.time_ns()
-            self.IMU.getAgmt() # read all axis and temp from sensor, note this also updates all instance variables
+            self.IMU.getAgmt()                      # read all axis and temp from sensor, note this also updates all instance variables
             self.ekf.Dt=(self.time_now-self.last_read)/1000000000
             self.last_read = self.time_now
             self.acc_data = np.array([float(self.IMU.axRaw),float(self.IMU.ayRaw),float(self.IMU.azRaw)]) * self.ACC_FSR/self.BIT_RESOLUTION
@@ -78,16 +78,9 @@ class IMUPublisher(Node):
             self.q = self.ekf.update( q=self.q,
                             gyr=self.gyr_data, 
                             acc=self.acc_data,
-                            # mag=self.mag_data,
                             # mag=np.array([ self.mag_data[0] , -self.mag_data[1] , -self.mag_data[2] ]),
                             )
-            # print('{: .2f}'.format(self.mag_data[0]), '{: .2f}'.format(self.mag_data[1]),'{: .2f}'.format(self.mag_data[2]),'{: .2f}'.format(self.acc_data[0]),'{: .2f}'.format(self.acc_data[1]),'{: .2f}'.format(self.acc_data[2]), end = "\r")
-            # print("")
-            # print(self.mag_data, end = "\r")
-            # self.imu_msg.orientation.w=self.q[0]
-            # self.imu_msg.orientation.x=self.q[1]
-            # self.imu_msg.orientation.y=self.q[2]
-            # self.imu_msg.orientation.z=self.q[3]
+
             self.publisher_.publish(Imu(
                 orientation = Quaternion(w=self.q[0], x=self.q[1], y=self.q[2], z=self.q[3]), 
                 angular_velocity = Vector3(x = self.gyr_data[0], y = self.gyr_data[1], z = self.gyr_data[2]),

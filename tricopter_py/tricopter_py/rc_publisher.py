@@ -62,7 +62,7 @@ class RosCsrf(Node):
                     if single_frame[2]==crsf.PacketsTypes.RC_CHANNELS_PACKED:
                         self.pwm=crsf.crsf2pwm(single_frame[3:25])
                         # print(self.pwm)
-                        self.rc_pub.publish(RCMessage(rc_roll=self.pwm[0], rc_pitch=self.pwm[1], rc_throttle=self.pwm[2], rc_yaw=self.pwm[3], aux1=self.pwm[4], aux2=self.pwm[5], aux3=self.pwm[6], aux4=self.pwm[7]))
+                        self.rc_pub.publish(RCMessage(rc_roll=int(self.pwm[0]), rc_pitch=int(self.pwm[1]), rc_throttle=int(self.pwm[2]), rc_yaw=int(self.pwm[3]), aux1=int(self.pwm[4]), aux2=int(self.pwm[5]), aux3=int(self.pwm[6]), aux4=int(self.pwm[7])))
 
 def main(args=None):
     rclpy.init()

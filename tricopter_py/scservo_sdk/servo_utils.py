@@ -47,7 +47,7 @@ class ServoUtils():
             print("%s" % self.packetHandler.getTxRxResult(scs_comm_result))
         if scs_error != 0:
             print("%s" % self.packetHandler.getRxPacketError(scs_error))
-        print((time.time_ns()-time_now)/1000000000)
+        print((time.time_ns()-time_now)/1000000000,end='\r')
 
     def close_port(self):
         # Close port
